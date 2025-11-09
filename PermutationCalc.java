@@ -4,9 +4,10 @@ import java.util.*;
 
 public class PermutationCalc {
 
+    // Factorial
     public long fctrl(int n) {
         long fact = 1;
-        for (int i = 1; i <= n; i++) fact *= i;
+        for (int i = 2; i <= n; i++) fact *= i; // start from 2 (1*1 unnecessary)
         return fact;
     }
 
@@ -16,49 +17,47 @@ public class PermutationCalc {
         arr[j] = temp;
     }
 
-    private void perGen(char[] arr, int start, int end, List<String> results) {
+    // Permutation Generator
+    private void perGnrtr(char[] arr, int start, int end, List<String> results) {
         if (start == end) {
-            results.add(String.valueOf(arr));
+            results.add(new String(arr));
         } else {
             for (int i = start; i <= end; i++) {
                 swap(arr, start, i);
-                perGen(arr, start + 1, end, results);
-                swap(arr, start, i);
+                perGnrtr(arr, start + 1, end, results);
+                swap(arr, start, i); // backtrack
             }
         }
     }
 
+    // Linear
     public List<String> getLnrPer(String input) {
-        char[] elements = input.toCharArray();
         List<String> results = new ArrayList<>();
-        perGen(elements, 0, elements.length - 1, results);
+        perGnrtr(input.toCharArray(), 0, input.length() - 1, results);
         return results;
     }
 
+    // Circular
     public List<String> getCrclrPer(String input) {
         if (input.length() <= 1) return Collections.singletonList(input);
-        char[] elements = input.toCharArray();
+        char fixed = input.charAt(0);
         List<String> results = new ArrayList<>();
-        char fixed = elements[0];
-        char[] remaining = Arrays.copyOfRange(elements, 1, elements.length);
         List<String> perms = new ArrayList<>();
-        perGen(remaining, 0, remaining.length - 1, perms);
-        for (String p : perms) {
-            results.add(fixed + p);
-        }
+        perGnrtr(input.substring(1).toCharArray(), 0, input.length() - 2, perms); // length-1 for remaining
+        for (String p : perms) results.add(fixed + p);
         return results;
     }
 
+    // Counter
     public long getLnrCnt(int n) { return fctrl(n); }
     public long getCrclrCnt(int n) { return (n <= 1) ? 1 : fctrl(n - 1); }
 
+    // Sample Space
     public void showSmpSpace(List<String> list, int columns) {
-        int count = 0;
-        for (String s : list) {
-            System.out.printf("%-10s", s);
-            count++;
-            if (count % columns == 0) System.out.println();
+        for (int i = 0; i < list.size(); i++) {
+            System.out.printf("%-10s", list.get(i));
+            if ((i + 1) % columns == 0) System.out.println();
         }
-        if (count % columns != 0) System.out.println();
+        if (list.size() % columns != 0) System.out.println();
     }
 }
